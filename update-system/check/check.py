@@ -18,7 +18,8 @@ installed_patch_list = []
 def get_cm_ip():
     return "10.0.33.145"
 
-def check_cmd_match_result(cmd, expect_output):
+def check_cmd_match_result(cmd, expect_output, success_str=None,
+        failed_str=None):
     """
     """
     cmd_list = shlex.split(cmd)
@@ -80,11 +81,11 @@ def check_patch_md5(path="./"):
         #    return False
         #else:
         #    return True
-    except subprocess.CalledProcessError :
+    except subprocess.CalledProcessError,e :
        # for line in e.output.split("\n"):
        #     logging.error(line) 
 
-        logging.debug(subprocess.CalledProcessError.output)
+        logging.debug(e.output)
         logging.debug("Exception",exc_info=True)
         logging.error("{}md5 check failed".format(path))
         return False
@@ -93,7 +94,6 @@ def check_patch_md5(path="./"):
         logging.debug("Exception",exc_info=True)
         logging.error("{}md5 check failed".format(path))
         return False
-
 
 def check_self_version():
     """
@@ -151,14 +151,19 @@ def check_service_status():
     return ret
 
 
-def check_cm_version():
+def check_cm_version(expect_version):
     version_file="/usr/local/apache-tomcat-8.0.32/webapps/ROOT/WEB-INF/classes/version.properties"
     try:
         with open(version_file,"r") as f:
             line=f.read()
             version=line.split("=")[1]
             logging.info(version)
-            return True
+            if version == expect_version:
+                return True
+            else:
+                logging.error("cm version {} not match.(expect {})"\
+                        .format(version, expect_version))
+                return False
     except:
         logging.debug("Exception",exc_info=True)
         logging.error("open version file {} failed ".format(version_file)) 
@@ -169,25 +174,42 @@ def check_cm_version():
 def check_cm_patch_status():
     """
     """
-    if not os.path.exists("/usr/local/cm")
-        installed_patch_list = []
-        return True
+    installed_patch_list = []
+    if not os.path.exists("/usr/local/cm"):
+        return installed_patch_list
     try:
         os.chdir("/usr/local/cm")
         output = subprocess.check_output("ls")
         installed_patch_list = output.strip().split("\n")
     except:
         logging.debug("",exc_info=True)
-    return True
+    return installed_patch_list
+
 
 def check_cm_file_status():
-    pass
+    return True
 
 def check_cm_task_running():
-    pass
+    url = "xxx"
+    req = urllib2.Request(url)
+    s = urllib2.urlopen(req)
+    info = s.read()
+    logging.info("running task:{}".format(info))
+    if info != "None":
+        return False
+    else:
+        return True
 
 def check_cm_online_people():
-    logging.info("")
+    url = "xxx"
+    req = urllib2.Request(url)
+    s = urllib2.urlopen(req)
+    info = s.read()
+    logging.info("online people:{}".format(info))
+    if info != "0":
+        return False
+    else:
+        return True
 
 def check_system_space():
     s = os.statvfs("/")
@@ -201,26 +223,31 @@ def check_system_space():
         return True
 
 def check_before_update():
-    pass
-
-def check_after_update():
-    pass
-
-if __name__ == "__main__":
     env_ok = False
+    expect_version = "2.0.36053.20160811R"
     env_ok = check_cm_visit() 
     env_ok = check_patch_md5() or env_ok
-    env_ok = check_self_version()  or env_ok 
+    #env_ok = check_self_version()  or env_ok 
     env_ok = check_service_version() or   env_ok 
     env_ok = check_service_status()  or env_ok 
-    env_ok = check_cm_version() or  env_ok 
-    env_ok = check_cm_patch_status()  or env_ok 
-    env_ok = check_cm_file_status() or env_ok 
-    env_ok = check_cm_task_running()  or env_ok 
-    env_ok = check_cm_online_people() or  env_ok 
+    env_ok = check_cm_version(expect_version) or  env_ok 
+    installed_patch_list = check_cm_patch_status()  or env_ok 
+    #env_ok = check_cm_file_status() or env_ok 
+    #env_ok = check_cm_task_running()  or env_ok 
+    #env_ok = check_cm_online_people() or  env_ok 
     env_ok = check_system_space() or  env_ok 
     if env_ok:
         logging.info("enviroment: OK")
     else:
         logging.error("enviroment: Fail")
 
+def check_after_update():
+    env_ok = check_service_status() 
+    env_ok = check_cm_visit() or ret
+    if env_ok:
+        logging.info("enviroment: OK")
+    else:
+        logging.error("enviroment: Fail")
+
+if __name__ == "__main__":
+    check_before_update()
