@@ -1,3 +1,10 @@
+01-install/
+02-bugfix/
+03-war/
+04-script/
+update.sh
+config/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
