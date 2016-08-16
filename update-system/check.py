@@ -7,6 +7,8 @@ import ssl
 import urllib2
 import traceback
 import shlex
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 from log import logger as logging
 
@@ -16,7 +18,7 @@ installed_patch_list = []
 
 
 def get_cm_ip():
-    return "10.0.33.145"
+    return u"10.0.33.145"
 
 def check_cmd_match_result(cmd, expect_output, success_str=None,
         failed_str=None):
@@ -25,10 +27,13 @@ def check_cmd_match_result(cmd, expect_output, success_str=None,
     cmd_list = shlex.split(cmd)
     try:
         output = subprocess.check_output(cmd_list,stderr=subprocess.STDOUT)
+        output = output.strip()
         logging.debug(output)
         if output == expect_output:
             return True
         else:
+            logging.debug("expect:({})".format(expect_output))
+            logging.debug("actual:({})".format(output))
             return False
     except subprocess.CalledProcessError,e :
         logging.debug(e.output)
@@ -133,15 +138,17 @@ def check_service_status():
     for name in service_name:
         cmd = "service {} status".format(name)
         try:
-            output = subprocess.check_output(cmd,stderr=subprocess.STDOUT)
+            cmd_list = shlex.split(cmd)
+            output = subprocess.check_output(cmd_list,stderr=subprocess.STDOUT)
             logging.info("{} status is OK".format(name))
             logging.debug(output)
             retcode = 0
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError, e:
             #logging.error(e.output) 
             #logging.exception("Exception")
             logging.debug(cmd)
             logging.debug("Exception",exc_info=True)
+            logging.error("service {} status check failed ".format(name))
             ret = False
         except :
             logging.debug(cmd)
@@ -156,7 +163,7 @@ def check_cm_version(expect_version):
     try:
         with open(version_file,"r") as f:
             line=f.read()
-            version=line.split("=")[1]
+            version=line.strip.split("=")[1]
             logging.info(version)
             if version == expect_version:
                 return True
@@ -190,7 +197,7 @@ def check_cm_file_status():
     return True
 
 def check_cm_task_running():
-    url = "xxx"
+    url = u"xxx"
     req = urllib2.Request(url)
     s = urllib2.urlopen(req)
     info = s.read()

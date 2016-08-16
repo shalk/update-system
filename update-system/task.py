@@ -1,11 +1,11 @@
 
 import subprocess
-import logging
+import shlex
+from log import logger as logging
 
-class Task:
+class Task(object):
     def __init__(self,*argv,**kwargv):
         pass
-
 
 
 class PatchTask(Task):
@@ -22,17 +22,23 @@ class PatchTask(Task):
 
     def run(self):
         cmd = "bash {}".format(self.path)
+        #cmd_list = shlex.split(cmd)
+        logging.debug("excute cmd ({})".format(cmd))
         try:
-            subprocess.check_call(cmd,shell=True)
-        except subprocess.CalledProcessError as err:
-            print("execute cmd {} fail \n failcode()".format(cmd, 
-                err.returncode))
+            output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
+            logging.debug(output)
+        except subprocess.CalledProcessError , e:
+            logging.debug("Exception",exc_info=True)
+            logging.error("execute {} failed".format(cmd))
+        except:
+            logging.debug("Exception",exc_info=True)
+            logging.error("execute {} failed".format(cmd))
 
     def content(self):
         """ content of PatchTask
             return string 
         """
-        return "father {} child {} path {}".format(self._father,self._children,
+        return "father: {}\n child :{}\n path {}\n".format(self._father,self._children,
                 self.path)
 
     def revert(self):
@@ -41,6 +47,7 @@ class PatchTask(Task):
     @property
     def father(self):
         return self._father
+
     @father.setter
     def father(self,father):
         self._father = father
@@ -48,6 +55,7 @@ class PatchTask(Task):
     @property
     def children(self):
         return self._children
+
     @children.setter
     def children(self,children):
         self._children=  children
@@ -55,7 +63,10 @@ class PatchTask(Task):
 
 
 if __name__ == "__main__":
-    a = PatchTask(path="../bugfix/SP1/001/cmd.sh")
+    a = PatchTask(path="../02-bugfix/SP1/021/test.sh")
+    a.father = "base"
+    a.child = "039"
     a.run()
+    print(a.content())
 
 

@@ -1,30 +1,49 @@
-#!/usr/bin/env python
-
-import sub
 import logging
+from datetime import datetime
 
-logger = logging.getLogger("spam")
-# create handler
-fh = logging.FileHandler("test.log")
-fh.setLevel(logging.DEBUG)
+def getlogger():
 
-ch = logging.StreamHandler()
-ch.setLevel(logging.WARNING)
+    logger = logging.getLogger()
 
-# create formatter
-ft1 = logging.Formatter('%(asctime)s - %(name)s -  \
-        %(levelname)s - %(message)s')
-# handler set format
-fh.setFormatter(ft1)
-ch.setFormatter(ft1)
+    now = datetime.now()
+    filename="/var/log/update-system.{}-{}-{}.log".format(now.year, now.month,
+            now.day)
+    # set formatter
+    logger.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s [%(levelname)s] - [%(module)s %(funcName)s() line:%(lineno)d ]: %(message)s',"%Y-%m-%d %H:%M:%S") 
 
-logger.addHandler(ch)
-logger.addHandler(fh)
+    # set fh 
+    fh = logging.FileHandler(filename, encoding="UTF-8")
+    fh.setFormatter(formatter)
+    fh.setLevel(logging.DEBUG)
+    # set ch
+    ch = logging.StreamHandler()
+    ch.setFormatter(formatter)
+    ch.setLevel(logging.INFO)
+    # set logger with ch and fh
+    logger.addHandler(ch)
+    logger.addHandler(fh)
 
-logger.debug("this is debug")
-logger.info("this is info")
-logger.warn("this is warn")
-logger.error("this is error")
-logger.fatal("this is fatal")
+    return logger
 
-sub.foo()
+#def svn_log():
+#    logger_filename="/var/log/svn.log"
+#
+#    logger = logging.getLogger()
+#    logger.setLevel(logging.DEBUG)
+#   # formatter = logging.Formatter('%(asctime)s [%(levelname)s] - %(filename)
+#    formatter = logging.Formatter('%(asctime)s [%(levelname)s] - [%(module)s %(funcName)s() line:%(lineno)d ]: %(message)s',"%Y-%m-%d %H:%M:%S")
+#    fh = logging.FileHandler(logger_filename,encoding = "UTF-8")
+#    fh.setLevel(logging.DEBUG)
+#    fh.setFormatter(formatter)
+#
+#    ch = logging.StreamHandler()
+#    ch.setLevel(logging.WARNING)
+#    ch.setFormatter(formatter)
+#
+#    logger.addHandler(fh)
+#    logger.addHandler(ch)
+#    return logger
+
+logger = getlogger()
+
