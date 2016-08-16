@@ -5,6 +5,7 @@ from log import logger as logging
 
 class Orchestra(object):
     def __init__(self, topo_config , task_path=None):
+        logging.info("init orchestra:{}".format(topo_config))
         self.topo_config_file = topo_config
         logging.debug("topo file:{}".format(topo_config))
         # 如果任务文件的路径 没有指定，假设和topo_config存放在同一目录下
@@ -19,6 +20,7 @@ class Orchestra(object):
 
         self.read_topology()
 
+        self.task_list = [ os.path.join(self.path,x)  for x in  self.task_list ] 
 
     def read_topology(self):
         """
@@ -27,10 +29,10 @@ class Orchestra(object):
         try:
             with open(self.topo_config_file,"rb") as f:
                 self.task_list = [ line.strip() for line in f.readlines() ]
-                loggging.debug("get task_list:\n{}".format(self.task_list))
-
+                logging.debug("get task_list:\n{}".format(self.task_list))
         except:
             logging.debug("Execption",exc_info=True)
+            logging.error("topo file open failed:",self.topo_config_file)
 
 
     def store_topology(self):
@@ -38,7 +40,7 @@ class Orchestra(object):
 
     def print_topology(self):
         for task in self.task_list:
-            print(os.path.join(self.path, task))
+            print(task)
 
     def topo_order_list(self):
         return self.task_list

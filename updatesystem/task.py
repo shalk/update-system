@@ -19,6 +19,7 @@ class PatchTask(Task):
         self.script = script
         self._father = "father"
         self._children = "child"
+        logging.info("init patchtask:{}".format(path))
 
     def check(self):
         file = os.path.join(self.path,self.script)
