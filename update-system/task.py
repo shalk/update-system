@@ -2,6 +2,7 @@
 import subprocess
 import shlex
 from log import logger as logging
+import os
 
 class Task(object):
     def __init__(self,*argv,**kwargv):
@@ -12,16 +13,22 @@ class PatchTask(Task):
     """
 
     """
-    def __init__(self, path):
+    def __init__(self, path, script="test.sh"):
         self.path = path
+        # need to change
+        self.script = script
         self._father = "father"
         self._children = "child"
 
     def check(self):
-        pass
+        file = os.path.join(self.path,self.script)
+        if os.path.isfile(file):
+            logging.debug("patch script:{} ".format(file)) 
+        else:
+            logging.error("patch script ({}) not exists".format(file))
 
     def run(self):
-        cmd = "bash {}".format(self.path)
+        cmd = "bash {}".format(os.path.join(self.path,self.script))
         #cmd_list = shlex.split(cmd)
         logging.debug("excute cmd ({})".format(cmd))
         try:
@@ -34,11 +41,11 @@ class PatchTask(Task):
             logging.debug("Exception",exc_info=True)
             logging.error("execute {} failed".format(cmd))
 
-    def content(self):
+    def __str__(self):
         """ content of PatchTask
             return string 
         """
-        return "father: {}\n child :{}\n path {}\n".format(self._father,self._children,
+        return "father: {}\nchild :{}\npath {}\n".format(self._father,self._children,
                 self.path)
 
     def revert(self):
@@ -60,13 +67,17 @@ class PatchTask(Task):
     def children(self,children):
         self._children=  children
 
+    @property
+    def status(self):
+        return self._status
 
 
 if __name__ == "__main__":
-    a = PatchTask(path="../02-bugfix/SP1/021/test.sh")
+    a = PatchTask(path="/root/project/ansible/update-system/02-bugfix/SP1/021/")
     a.father = "base"
     a.child = "039"
     a.run()
-    print(a.content())
+    a.check()
+    print(a)
 
 

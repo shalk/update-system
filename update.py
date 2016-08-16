@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 # -*- coding = utf-8 -*-
-import os
-import sys
-import logging
+from updatesystem import task
 
-if True:
-    nice = True
 
-print("Hello World!")
-print('Hello World!')
-os.path.
-
+task = task.PatchTask(path="/root/project/ansible\
+        /update-system/02-bugfix/SP1/021/")
+print(task)
+task.check()
+task.run()
 
