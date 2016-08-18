@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+import sys
 from updatesystem import task
 from updatesystem import orchestra 
-from updatesystem.cli import parser
+from updatesystem.cli import parser,get_args_config
 # TODO
 #　单元测试
 #  日志控制
@@ -10,7 +11,8 @@ from updatesystem.cli import parser
 
 def command_line():
     args = parser.parse_args()
-    print(args)
+    config = get_args_config(parser, sys.argv[1:])
+    #print(args)
 
 command_line()
 
