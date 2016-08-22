@@ -5,7 +5,7 @@ import sys
 import subprocess
 import ssl
 import urllib2
-import traceback
+#import traceback
 import shlex
 reload(sys)
 sys.setdefaultencoding('utf-8')

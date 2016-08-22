@@ -18,21 +18,21 @@ class Orchestra(object):
 
         self.task_list = []
 
-        self.read_topology()
+        self.read_topology(topo_config)
 
         self.task_list = [ os.path.join(self.path,x)  for x in  self.task_list ] 
 
-    def read_topology(self):
+    def read_topology(self,filename):
         """
         通过配置文件，获得拓扑顺序
         """
         try:
-            with open(self.topo_config_file,"rb") as f:
+            with open(filename,"rb") as f:
                 self.task_list = [ line.strip() for line in f.readlines() ]
                 logging.debug("get task_list:\n{}".format(self.task_list))
         except:
             logging.debug("Execption",exc_info=True)
-            logging.error("topo file open failed:",self.topo_config_file)
+            logging.error("topo file open failed:",filename)
 
 
     def store_topology(self):

@@ -48,6 +48,7 @@ def get_args_config(parser,args_input):
     传入解析器和参数，获得updatesystem的参数字典
     返回 dict
     """
+   
     config = dict()
     config['install'] = False
     config['check'] = False

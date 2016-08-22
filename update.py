@@ -9,14 +9,22 @@ from updatesystem.cli import parser,get_args_config
 #  日志控制
 #  命令行接口 
 
-def command_line():
-    args = parser.parse_args()
-    config = get_args_config(parser, sys.argv[1:])
-    #print(args)
+import updatesystem
 
-command_line()
 
-orch = orchestra.Orchestra("./02-bugfix/SP1/patch.list")
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    us = updatesystem.UpdateSystem(cli_args=args)
+    us.run()
+
+#def command_line():
+#    args = parser.parse_args()
+#    config = get_args_config(parser, sys.argv[1:])
+#    #print(args)
+#
+#command_line()
+#
+#orch = orchestra.Orchestra("./02-bugfix/SP1/patch.list")
 
 #orch.print_topology()
 
