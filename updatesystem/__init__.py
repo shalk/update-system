@@ -13,7 +13,7 @@ class UpdateSystem(object):
 
     def __init__(self,cli_args=None):
         self.config = self.read_config(cli_args) 
-        self.checker = Checker() 
+        self.checker = Checker(patch_path=self.config.get('orchestra_file_path')) 
         logging.info(self.config)
 
     def read_config(self,cli_args):
@@ -39,9 +39,9 @@ class UpdateSystem(object):
         judge what to do
         """
         if self.config['install']:
-            if self.config['install_all']:
+            if self.config.get('install_all'):
                 self.run_orchestra()
-            elif self.config['install_patch']:
+            elif self.config.get('install_patch'):
                 self.run_task()
             else:
                 logging.error("install command fail for unknown task ")

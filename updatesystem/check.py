@@ -29,8 +29,9 @@ class Checker(object):
         "mariadb"  : "mariadb-server-5.5.44-2.el7.centos.x86_64",
         "tomcat": "/usr/local/apache-tomcat-8.0.32/", 
     }
-    def __init__(self):
-        pass
+    def __init__(self,patch_path="/home/update/02-bugfix/"):
+        self.patch_path = patch_path
+        self.version_file="/usr/local/apache-tomcat-8.0.32/webapps/ROOT/WEB-INF/classes/version.properties"
     
     def get_cm_ip(self):
         return u"10.0.33.145"
@@ -76,10 +77,11 @@ class Checker(object):
             logging.error("can not connect cm (code:{})".format(s.code))
             return False
     
-    def check_patch_md5(self,path="./"):
+    def check_patch_md5(self,):
         """
         检查patch完整性
         """
+        path = self.patch_path
         logging.info("patch path:{}".format(os.getcwd()))
         if not os.path.exists(path):
             logging.error("{} is not exists! ".format(path))
@@ -173,7 +175,7 @@ class Checker(object):
     
     
     def check_cm_version(self,expect_version):
-        version_file="/usr/local/apache-tomcat-8.0.32/webapps/ROOT/WEB-INF/classes/version.properties"
+        version_file=self.version_file
         try:
             with open(version_file,"r") as f:
                 line=f.read()
@@ -252,7 +254,6 @@ class Checker(object):
         env_ok = self.check_service_version() and   env_ok 
         env_ok = self.check_service_status()  and env_ok 
         env_ok = self.check_cm_version(expect_version) and  env_ok 
-        print(env_ok)
         installed_patch_list = self.check_cm_patch_status()  and env_ok 
         #env_ok = self.check_cm_file_status() and env_ok 
         #env_ok = self.check_cm_task_running()  and env_ok 
@@ -263,7 +264,7 @@ class Checker(object):
         else:
             logging.error("enviroment: Fail")
     
-    def check_after_update():
+    def check_after_update(self):
         env_ok = self.check_service_status() 
         env_ok = self.check_cm_visit() and env_ok 
         if env_ok:

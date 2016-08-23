@@ -1,4 +1,5 @@
 
+import os.path
 from log import logger as logging
 import ConfigParser
 
@@ -24,6 +25,9 @@ def get_config(filename="/etc/us/config.ini",section_name="local",config_default
     """
     config = dict()
     cf = ConfigParser.ConfigParser()
+    if not  os.path.isfile(filename):
+        logging.error("config file {} is not exists".format(filename))
+        return config
     try:
         logging.debug("read file {}".format(filename))
         cf.read(filename)
