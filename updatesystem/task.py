@@ -42,6 +42,7 @@ class PatchTask(Task):
         except subprocess.CalledProcessError , e:
             logging.debug("Exception",exc_info=True)
             logging.error("execute {} failed".format(cmd))
+            logging.error("execute output: {} ".format(e.output))
             return False
         except:
             logging.debug("Exception",exc_info=True)

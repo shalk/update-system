@@ -36,6 +36,10 @@ class UpdateSystem(object):
         if config.get("patch_path"):
             config["orchestra_file_path"] = config["patch_path"]
 
+        # hard code
+
+        config["task_script_name"] = "ansible.sh"
+
         logging.debug(config)
         return config
 
@@ -80,7 +84,7 @@ class UpdateSystem(object):
 
         for task_path in task_info_list:
             logging.debug("create task {}".format(task_path))
-            t = PatchTask(path=task_path)
+            t = PatchTask(path=task_path,script=self.config["task_script_name"])
             t.run()
             if t.run():
                 logging.info("run task [{}] success".format(task_path))
@@ -94,7 +98,7 @@ class UpdateSystem(object):
                 logging.error("{} is not dir ".format(task_path))
                 continue
             logging.debug("create task {}".format(task_path))
-            t = PatchTask(path=task_path)
+            t = PatchTask(path=task_path,script=self.config["task_script_name"])
             if t.run():
                 logging.info("run task [{}] success".format(patch_name))
             else:
