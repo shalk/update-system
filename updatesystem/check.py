@@ -82,7 +82,7 @@ class Checker(object):
         检查patch完整性
         """
         path = self.patch_path
-        logging.info("patch path:{}".format(os.getcwd()))
+        logging.info("patch path:{}".format(path))
         if not os.path.exists(path):
             logging.error("{} is not exists! ".format(path))
             return False
@@ -143,8 +143,10 @@ class Checker(object):
             ret = self.check_cmd_match_result(cmd_dict[name]["cmd"],cmd_dict[name]['result'])
             if ret :
                 logging.info( "service {}  version is right  ".format(name))
+                return True
             else:
                 logging.error( "service {} version is not match".format(name)) 
+                return False
     
     def check_service_status(self):
         """
@@ -179,7 +181,7 @@ class Checker(object):
         try:
             with open(version_file,"r") as f:
                 line=f.read()
-                version=line.strip.split("=")[1]
+                version=line.strip().split("=")[1]
                 logging.info(version)
                 if version == expect_version:
                     return True

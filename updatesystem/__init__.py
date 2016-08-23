@@ -31,6 +31,11 @@ class UpdateSystem(object):
 
         for key in config_cmd:
             config[key] = config_cmd[key]
+
+        # patch_path from command line will override orchestra_file_path
+        if config.get("patch_path"):
+            config["orchestra_file_path"] = config["patch_path"]
+
         logging.debug(config)
         return config
 
@@ -84,7 +89,7 @@ class UpdateSystem(object):
 
     def run_task(self):
         for patch_name in self.config['install_patch']:
-            task_path = os.path.join(path,patch_name)
+            task_path = os.path.join(self.config.get('orchestra_file_path') ,patch_name)
             if not os.path.isdir(task_path):
                 logging.error("{} is not dir ".format(task_path))
                 continue
