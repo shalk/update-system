@@ -25,8 +25,11 @@ class PatchTask(Task):
         file = os.path.join(self.path,self.script)
         if os.path.isfile(file):
             logging.debug("patch script:{} ".format(file)) 
+            return True
         else:
             logging.error("patch script ({}) not exists".format(file))
+            return False
+
 
     def run(self):
         cmd = "bash {}".format(os.path.join(self.path,self.script))
@@ -35,12 +38,15 @@ class PatchTask(Task):
         try:
             output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
             logging.debug(output)
+            return True
         except subprocess.CalledProcessError , e:
             logging.debug("Exception",exc_info=True)
             logging.error("execute {} failed".format(cmd))
+            return False
         except:
             logging.debug("Exception",exc_info=True)
             logging.error("execute {} failed".format(cmd))
+            return False
 
     def __str__(self):
         """ content of PatchTask

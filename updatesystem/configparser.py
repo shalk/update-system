@@ -2,8 +2,9 @@
 from log import logger as logging
 import ConfigParser
 
-config_local_default={
-"bugfix": "/home/bugfix",
+config_local_default={ 
+"orchestra_file_path": "",
+"orchestra_file_name": "",
     }
 
 def safe_get(cf,section,key,default):
@@ -17,17 +18,19 @@ def safe_get(cf,section,key,default):
         return default
 
 
-def get_config(file="./config.ini",section_name="local"):
+def get_config(filename="/etc/us/config.ini",section_name="local",config_default=config_local_default):
     """
+    
     """
     config = dict()
     cf = ConfigParser.ConfigParser()
     try:
-        cf.read(file)
-        for key in config_local_default:
-            config[key] = safe_get(cf,section_name, key, config_local_default[key])
+        logging.debug("read file {}".format(filename))
+        cf.read(filename)
+        for key in config_default:
+            config[key] = safe_get(cf,section_name, key, config_default[key])
     except IOError,e:
-        logging.error("read file failed: {}".format(file),exc_info=True)
+        logging.error("read file failed: {}".format(filename),exc_info=True)
     except ConfigParser.NoOptionError, e:
         logging.error("NoOptionError" ,exc_info=True)
     except:

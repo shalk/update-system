@@ -60,17 +60,18 @@ def get_args_config(parser,args_input):
         if args.path is not None:
             config['patch_path'] = args.path
             logging.debug("patch path:{}".format(args.path))
-
-
         if args.patch_name == ['ALL']:
             config['install_all'] = True
+            config['install'] = True
             logging.info("install all patch")
         elif args.patch_name is not None: 
+            config['install'] = True
             config['install_patch'] =  args.patch_name
             logging.info("install patch:{}".format(args.patch_name))
         else:
             logging.error("not option for install command ")
     elif args.subparser_name == "check":
+        config['check'] = True
         if args.before:
             logging.info("check before update")
             config["check_time"] = "before"
@@ -81,10 +82,11 @@ def get_args_config(parser,args_input):
             config["check_time"] = "after"
             logging.info("default: check after update")
     elif args.subparser_name == "status":
+        config['status'] = True
         logging.info("look up status")
     else:
         logging.error("unknown command:{}".format(args.subparser_name))
-    logging.info("config:{}".format(config))
+    logging.debug("config:{}".format(config))
     return config
     
 

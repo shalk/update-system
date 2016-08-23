@@ -29,7 +29,7 @@ class Orchestra(object):
         try:
             with open(filename,"rb") as f:
                 self.task_list = [ line.strip() for line in f.readlines() ]
-                logging.debug("get task_list:\n{}".format(self.task_list))
+                logging.debug("get task_list:{}".format(self.task_list))
         except:
             logging.debug("Execption",exc_info=True)
             logging.error("topo file open failed:",filename)

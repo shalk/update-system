@@ -4,10 +4,11 @@ from datetime import datetime
 def getlogger():
 
     logger = logging.getLogger()
-
+    # hard code
     now = datetime.now()
     filename="/var/log/update-system.{}-{}-{}.log".format(now.year, now.month,
             now.day)
+
     # set formatter
     logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s [%(levelname)s] - [%(module)s %(funcName)s() line:%(lineno)d ]: %(message)s',"%Y-%m-%d %H:%M:%S") 
