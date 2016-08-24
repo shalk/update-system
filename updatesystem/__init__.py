@@ -85,7 +85,6 @@ class UpdateSystem(object):
         for task_path in task_info_list:
             logging.debug("create task {}".format(task_path))
             t = PatchTask(path=task_path,script=self.config["task_script_name"])
-            t.run()
             if t.run():
                 logging.info("run task [{}] success".format(task_path))
             else:
