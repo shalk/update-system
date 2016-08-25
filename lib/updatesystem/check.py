@@ -238,10 +238,11 @@ class Checker(object):
         req = urllib2.Request(url)
         s = urllib2.urlopen(req)
         info = s.read()
-        logging.info("online people:{}".format(info))
         if info != "0":
+            logging.debug("online people:{}".format(info))
             return False
         else:
+            logging.info("online people:{}".format(info))
             return True
     
     def check_system_space(self):
@@ -270,20 +271,20 @@ class Checker(object):
         env_ok = self.check_cm_online_people() and  env_ok 
         env_ok = self.check_system_space() and  env_ok 
         if env_ok:
-            logging.info("enviroment: OK")
+            logging.info("check enviroment: OK")
             return True
         else:
-            logging.error("enviroment: Fail")
+            logging.error("check enviroment: Fail")
             return False
     
     def check_after_update(self):
         env_ok = self.check_service_status() 
         env_ok = self.check_cm_visit() and env_ok 
         if env_ok:
-            logging.info("enviroment: OK")
+            logging.info("check enviroment: OK")
             return True
         else:
-            logging.error("enviroment: Fail")
+            logging.error("check enviroment: Fail")
             return False
 
 if __name__ == "__main__":

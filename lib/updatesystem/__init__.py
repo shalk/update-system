@@ -47,19 +47,24 @@ class UpdateSystem(object):
         """
         judge what to do
         """
+        ret = False
         if self.config['install']:
             if self.config.get('install_all'):
-                self.run_orchestra()
+                ret = self.run_orchestra()
             elif self.config.get('install_patch'):
-                self.run_task()
+                ret = self.run_task()
             else:
                 logging.error("install command fail for unknown task ")
+                ret = False
         elif self.config['check']:
-            self.run_check()
+            ret = self.run_check()
         elif self.config['status']:
             self.run_status()
+            ret = True
         else:
             logging.error("command unknown")
+            ret = False
+        return ret
 
     def run_orchestra(self):
         """
@@ -69,19 +74,19 @@ class UpdateSystem(object):
         orchestra_file_name = self.config.get('orchestra_file_name')
         if orchestra_file_name is None :
             logging.error("orchestra_file_name is None in config file")
-            return
+            return False
         if orchestra_file_path is None :
             logging.error("orchestra_file_path is None in config file")
-            return
+            return False
 
         orchestra_file = os.path.join( orchestra_file_path, orchestra_file_name)
         if not os.path.exists(orchestra_file):
             logging.error("orchestra file {} is not exists!".format(orchestra_file))
-            return
+            return False
         logging.debug("create orchestra by file {}".format(orchestra_file))
         orch = Orchestra(topo_config=orchestra_file)
         task_info_list = orch.topo_order_list()
-
+        ret = True
         for task_path in task_info_list:
             logging.debug("create task {}".format(task_path))
             t = PatchTask(path=task_path,script=self.config["task_script_name"])
@@ -89,8 +94,11 @@ class UpdateSystem(object):
                 logging.info("run task [{}] success".format(task_path))
             else:
                 logging.error("run task [{}] fail".format(task_path))
+                ret = False
+        return ret
 
     def run_task(self):
+        ret = True
         for patch_name in self.config['install_patch']:
             task_path = os.path.join(self.config.get('orchestra_file_path') ,patch_name)
             if not os.path.isdir(task_path):
@@ -102,6 +110,8 @@ class UpdateSystem(object):
                 logging.info("run task [{}] success".format(patch_name))
             else:
                 logging.error("run task [{}] fail".format(patch_name))
+                ret = False
+        return ret
 
     def run_check(self):
         ret = False
