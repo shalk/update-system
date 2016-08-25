@@ -12,6 +12,9 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 from log import logger as logging
+import socket
+import fcntl
+import struct
 
 
 class Checker(object):
@@ -33,8 +36,13 @@ class Checker(object):
         self.patch_path = patch_path
         self.version_file="/usr/local/apache-tomcat-8.0.32/webapps/ROOT/WEB-INF/classes/version.properties"
     
-    def get_cm_ip(self):
-        return u"10.0.33.145"
+    def get_cm_ip(self,ifname="eno16777984"):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        return socket.inet_ntoa(fcntl.ioctl(
+            s.fileno(),
+            0x8915,  # SIOCGIFADDR
+            struct.pack('256s', ifname[:15])
+        )[20:24])
     
     def check_cmd_match_result(self,cmd, expect_output, success_str=None,
             failed_str=None):
@@ -226,7 +234,7 @@ class Checker(object):
             return True
     
     def check_cm_online_people(self):
-        url = "xxx"
+        url = "https://{}/web-dist/userMgmt/getOnlineUserNum".format(self.get_cm_ip())
         req = urllib2.Request(url)
         s = urllib2.urlopen(req)
         info = s.read()
@@ -259,20 +267,24 @@ class Checker(object):
         installed_patch_list = self.check_cm_patch_status()  and env_ok 
         #env_ok = self.check_cm_file_status() and env_ok 
         #env_ok = self.check_cm_task_running()  and env_ok 
-        #env_ok = self.check_cm_online_people() and  env_ok 
+        env_ok = self.check_cm_online_people() and  env_ok 
         env_ok = self.check_system_space() and  env_ok 
         if env_ok:
             logging.info("enviroment: OK")
+            return True
         else:
             logging.error("enviroment: Fail")
+            return False
     
     def check_after_update(self):
         env_ok = self.check_service_status() 
         env_ok = self.check_cm_visit() and env_ok 
         if env_ok:
             logging.info("enviroment: OK")
+            return True
         else:
             logging.error("enviroment: Fail")
+            return False
 
 if __name__ == "__main__":
     ck = Checker()

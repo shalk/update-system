@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # -*- encoding: UTF-8 -*-
 from setuptools import setup,find_packages
 
@@ -9,6 +9,7 @@ setup(
     package_dir={ '': 'lib' },
     install_requires = [          # 安装依赖的其他包
     ],
+    zip_safe=True,                # 设定项目包为安全，不用每次都检测其安全性
     scripts=[
          'bin/us',
     ],
