@@ -223,18 +223,19 @@ class Checker(object):
         return True
     
     def check_cm_task_running(self):
-        url = u"xxx"
+        url = "https://{}/task/getRunningTaskNum".format(self.get_cm_ip())
         req = urllib2.Request(url)
         s = urllib2.urlopen(req)
         info = s.read()
-        logging.info("running task:{}".format(info))
-        if info != "None":
+        if info != "0":
+            logging.debug("running task:{}".format(info))
             return False
         else:
+            logging.debug("running task:{}".format(info))
             return True
     
     def check_cm_online_people(self):
-        url = "https://{}/web-dist/userMgmt/getOnlineUserNum".format(self.get_cm_ip())
+        url = "https://{}/userMgmt/getOnlineUserNum".format(self.get_cm_ip())
         req = urllib2.Request(url)
         s = urllib2.urlopen(req)
         info = s.read()

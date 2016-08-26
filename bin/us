@@ -8,6 +8,6 @@ if __name__ == "__main__":
     args = sys.argv[1:]
     us = updatesystem.UpdateSystem(cli_args=args)
     if us.run():
-        os.exit(0)
+        sys.exit(0)
     else:
-        os.exit(1) 
+        sys.exit(1) 
