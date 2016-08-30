@@ -32,9 +32,13 @@ class Checker(object):
         "mariadb"  : "mariadb-server-5.5.44-2.el7.centos.x86_64",
         "tomcat": "/usr/local/apache-tomcat-8.0.32/", 
     }
-    def __init__(self,patch_path="/home/update/02-bugfix/"):
+    def __init__(self,patch_path="/home/update/02-bugfix/",cm_ip=None):
         self.patch_path = patch_path
         self.version_file="/usr/local/apache-tomcat-8.0.32/webapps/ROOT/WEB-INF/classes/version.properties"
+        if cm_ip is None:
+            self.cm_ip = self.get_cm_ip()
+        else:
+            self.cm_ip = cm_ip
     
     def get_cm_ip(self,ifname="eno16777984"):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -73,16 +77,21 @@ class Checker(object):
         """
         检查cm可以访问
         """
-        url="https://{ip}/".format(ip=self.get_cm_ip())
+        url="https://{ip}/".format(ip=self.cm_ip)
         #url="http://10.0.33.148:8000/navi/"
         req = urllib2.Request(url)
-        s = urllib2.urlopen(req)
-        if s.getcode() == 200:
-            #logging.info(s.info())
-            logging.info("connect cm  success(code:{})".format(s.code))
-            return True
-        else:
-            logging.error("can not connect cm (code:{})".format(s.code))
+        try:
+            s = urllib2.urlopen(req)
+            if s.getcode() == 200:
+                #logging.info(s.info())
+                logging.info("connect cm  success(code:{})".format(s.code))
+                return True
+            else:
+                logging.error("can not connect cm (code:{})".format(s.code))
+                return False
+        except:
+            logging.error("connect url fail({})".format(url))
+            logging.debug("Execption",exc_info=True)
             return False
     
     def check_patch_md5(self,):
@@ -223,28 +232,47 @@ class Checker(object):
         return True
     
     def check_cm_task_running(self):
-        url = "https://{}/task/getRunningTaskNum".format(self.get_cm_ip())
+        url = "https://{}/task/getRunningTaskNum".format(self.cm_ip)
         req = urllib2.Request(url)
-        s = urllib2.urlopen(req)
-        info = s.read()
-        if info != "0":
-            logging.debug("running task:{}".format(info))
+        try:
+            s = urllib2.urlopen(req)
+            info = s.read()
+            if info == "0":
+                logging.info("running task:{}".format(info))
+                return True
+            elif len(info) > 20 :
+                logging.debug("running task info:{}".format(info))
+                logging.error("running task get wrong info:{}".format(info[:20]))
+                return False
+            else:
+                logging.error("running task:{}".format(info))
+                return False
+        except:
+            logging.error("connect url fail ({})".format(url))
+            logging.debug("Execption",exc_info=True)
             return False
-        else:
-            logging.debug("running task:{}".format(info))
-            return True
+
     
     def check_cm_online_people(self):
-        url = "https://{}/userMgmt/getOnlineUserNum".format(self.get_cm_ip())
+        url = "https://{}/userMgmt/getOnlineUserNum".format(self.cm_ip)
         req = urllib2.Request(url)
-        s = urllib2.urlopen(req)
-        info = s.read()
-        if info != "0":
-            logging.debug("online people:{}".format(info))
+        try:
+            s = urllib2.urlopen(req)
+            info = s.read()
+            if info == "0":
+                logging.info("online people:{}".format(info))
+                return True
+            elif len(info) > 20:
+                logging.debug("online people info:{}".format(info))
+                logging.error("oneline people get wrong info:{}".format(info[:20]))
+                return False
+            else:
+                logging.error("online people:{}".format(info))
+                return False
+        except:
+            logging.error("connect url fail({})".format(url))
+            logging.debug("Execption",exc_info=True)
             return False
-        else:
-            logging.info("online people:{}".format(info))
-            return True
     
     def check_system_space(self):
         s = os.statvfs("/")
@@ -268,7 +296,7 @@ class Checker(object):
         env_ok = self.check_cm_version(expect_version) and  env_ok 
         installed_patch_list = self.check_cm_patch_status()  and env_ok 
         #env_ok = self.check_cm_file_status() and env_ok 
-        #env_ok = self.check_cm_task_running()  and env_ok 
+        env_ok = self.check_cm_task_running()  and env_ok 
         env_ok = self.check_cm_online_people() and  env_ok 
         env_ok = self.check_system_space() and  env_ok 
         if env_ok:
@@ -289,5 +317,5 @@ class Checker(object):
             return False
 
 if __name__ == "__main__":
-    ck = Checker()
+    ck = Checker(cm_ip="10.0.36.216")
     ck.check_before_update()
