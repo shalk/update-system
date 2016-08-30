@@ -13,7 +13,7 @@ def get_parser():
     Command:
      install  [--path PATH]  [ --all ]  [ NAME ]
      status
-     check  [--before | --after]
+     check  [--path PATH] [--before | --after]
     
     """
     parser = argparse.ArgumentParser(description="""
@@ -36,6 +36,7 @@ def get_parser():
     parser_check   = subparsers.add_parser("check", help="check the environment")
 
 
+    parser_check.add_argument("--path",help="install path")
     parser_check_group = parser_check.add_mutually_exclusive_group()
 
     parser_check_group.add_argument("--before", action="store_true",help="check status before update ")
@@ -72,6 +73,9 @@ def get_args_config(parser,args_input):
             logging.error("not option for install command ")
     elif args.subparser_name == "check":
         config['check'] = True
+        if args.path is not None:
+            config['patch_path'] = args.path
+            logging.debug("patch path:{}".format(args.path))
         if args.before:
             logging.info("check before update")
             config["check_time"] = "before"

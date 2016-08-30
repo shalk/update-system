@@ -26,7 +26,8 @@ class Checker(object):
     section_name = "check"
     
     config_check_default = {
-        "version" :   "2.0.36053.20160811R",
+        #"version" :   "2.0.36053.20160811R",
+        "version" :   "2.0.35757.20160622R",
         "rabbitmq" : "rabbitmq-server-3.3.5-16.el7.noarch",
         "redis" : "redis-2.8.19-2.el7.x86_64",
         "mariadb"  : "mariadb-server-5.5.44-2.el7.centos.x86_64",
@@ -35,10 +36,12 @@ class Checker(object):
     def __init__(self,patch_path="/home/update/02-bugfix/",cm_ip=None):
         self.patch_path = patch_path
         self.version_file="/usr/local/apache-tomcat-8.0.32/webapps/ROOT/WEB-INF/classes/version.properties"
+        self._config = configparser.get_config(section_name=self.section_name,config_default=self.config_check_default)
         if cm_ip is None:
             self.cm_ip = self.get_cm_ip()
         else:
             self.cm_ip = cm_ip
+        print(self._config)
     
     def get_cm_ip(self,ifname="eno16777984"):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -194,8 +197,10 @@ class Checker(object):
         return ret
     
     
-    def check_cm_version(self,expect_version):
+    def check_cm_version(self,):
         version_file=self.version_file
+        expect_version = self._config['version']
+
         try:
             with open(version_file,"r") as f:
                 line=f.read()
@@ -288,13 +293,12 @@ class Checker(object):
     
     def check_before_update(self):
         env_ok = False
-        expect_version = "2.0.36053.20160811R"
         env_ok = self.check_cm_visit() 
         env_ok = self.check_patch_md5() and env_ok
         #env_ok =self.check_self_version()  and env_ok 
         env_ok = self.check_service_version() and   env_ok 
         env_ok = self.check_service_status()  and env_ok 
-        env_ok = self.check_cm_version(expect_version) and  env_ok 
+        env_ok = self.check_cm_version() and  env_ok 
         installed_patch_list = self.check_cm_patch_status()  and env_ok 
         #env_ok = self.check_cm_file_status() and env_ok 
         env_ok = self.check_cm_task_running()  and env_ok 
