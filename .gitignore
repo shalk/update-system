@@ -4,6 +4,7 @@
 04-script/
 update.sh
 config/
+bin/us.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -142,6 +142,7 @@ class Checker(object):
     def check_service_version(self):
         """
         """
+        ret = True
         cmd_dict = {
                 "rabbitmq":
                 {"cmd": "rpm -q rabbitmq-server" , 
@@ -157,13 +158,13 @@ class Checker(object):
                 "result":"/usr/local/apache-tomcat-8.0.32/" },
                 }
         for name in cmd_dict:
-            ret = self.check_cmd_match_result(cmd_dict[name]["cmd"],cmd_dict[name]['result'])
-            if ret :
+            ret_status = self.check_cmd_match_result(cmd_dict[name]["cmd"],cmd_dict[name]['result'])
+            if ret_status :
                 logging.info( "service {}  version is right  ".format(name))
-                return True
             else:
+                ret = False
                 logging.error( "service {} version is not match".format(name)) 
-                return False
+        return ret
     
     def check_service_status(self):
         """
@@ -240,10 +241,10 @@ class Checker(object):
             if info == "0":
                 logging.info("running task:{}".format(info))
                 return True
-            elif len(info) > 20 :
+            elif len(info) > 50 :
                 logging.debug("running task info:{}".format(info))
-                logging.error("running task get wrong info:{}".format(info[:20]))
-                return False
+                logging.info("running task get wrong info:{}".format(info[:20]))
+                return True
             else:
                 logging.error("running task:{}".format(info))
                 return False
@@ -262,10 +263,10 @@ class Checker(object):
             if info == "0":
                 logging.info("online people:{}".format(info))
                 return True
-            elif len(info) > 20:
+            elif len(info) > 50:
                 logging.debug("online people info:{}".format(info))
-                logging.error("oneline people get wrong info:{}".format(info[:20]))
-                return False
+                logging.info("oneline people get wrong info:{}".format(info[:20]))
+                return True
             else:
                 logging.error("online people:{}".format(info))
                 return False
