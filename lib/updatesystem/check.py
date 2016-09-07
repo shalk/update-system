@@ -41,7 +41,7 @@ class Checker(object):
             self.cm_ip = self.get_cm_ip()
         else:
             self.cm_ip = cm_ip
-        print(self._config)
+        logging.debug(self._config)
     
     def get_cm_ip(self,ifname="eno16777984"):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
