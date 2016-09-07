@@ -6,7 +6,7 @@ def getlogger():
     logger = logging.getLogger()
     # hard code
     now = datetime.now()
-    filename="/var/log/update-system.{}-{}-{}.log".format(now.year, now.month,
+    filename="/var/log/update-system.{}-{:02d}-{:02d}.log".format(now.year, now.month,
             now.day)
 
     # set formatter
