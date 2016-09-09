@@ -3,7 +3,7 @@
 import os,sys
 from setuptools import setup,find_packages
 
-version="0.0.3"
+version="0.0.5"
 # from http://www.pydanny.com/python-dot-py-tricks.html
 if sys.argv[-1] == 'publish':
     os.system("python setup.py sdist upload")

@@ -248,7 +248,7 @@ class Checker(object):
                 return True
             elif len(info) > 50 :
                 logging.debug("running task info:{}".format(info))
-                logging.info("running task get wrong info:{}".format(info[:20]))
+                logging.debug("running task get wrong info:{}".format(info[:20]))
                 return True
             else:
                 logging.error("running task:{}".format(info))
@@ -270,7 +270,7 @@ class Checker(object):
                 return True
             elif len(info) > 50:
                 logging.debug("online people info:{}".format(info))
-                logging.info("oneline people get wrong info:{}".format(info[:20]))
+                logging.debug("oneline people get wrong info:{}".format(info[:20]))
                 return True
             else:
                 logging.error("online people:{}".format(info))
