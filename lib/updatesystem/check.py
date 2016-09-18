@@ -19,7 +19,9 @@ import struct
 
 class Checker(object):
     # monkey patch
-    ssl._create_default_https_context = ssl._create_unverified_context
+    if hasattr(ssl,"_create_default_https_context"):
+        ssl._create_default_https_context = ssl._create_unverified_context
+
     installed_patch_list = []
     
     
